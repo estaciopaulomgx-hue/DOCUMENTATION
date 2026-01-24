@@ -1,0 +1,71 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Search Inventory System</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>📸 Image Inventory</h1>
+            <p>Search and manage your product images</p>
+        </div>
+
+        <!-- Search Section -->
+        <div class="search-section">
+            <div class="search-upload-container">
+                <div class="search-bar">
+                    <input type="text" id="searchInput" placeholder="Search images...">
+                </div>
+                <div class="upload-section">
+                    <div class="file-input-wrapper">
+                        <input type="file" id="fileInput" accept="image/*" multiple>
+                        <label for="fileInput" class="file-input-label">Choose File</label>
+                    </div>
+                    <button class="upload-btn" id="uploadBtn">Upload</button>
+                </div>
+            </div>
+
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-value" id="totalImages">0</div>
+                    <div class="stat-label">Total Images</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="foundImages">0</div>
+                    <div class="stat-label">Found</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="selectedImages">0</div>
+                    <div class="stat-label">Selected</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Images Grid -->
+        <div class="images-grid" id="imagesGrid"></div>
+
+        <!-- No Results -->
+        <div class="no-results" id="noResults" style="display: none;">
+            <div class="no-results-icon">🔍</div>
+            <h3>No images found</h3>
+            <p>Try a different search term or upload new images</p>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal" id="imageModal">
+        <div class="modal-content">
+            <button class="modal-close" id="modalClose">×</button>
+            <img src="" alt="" class="modal-image" id="modalImage">
+        </div>
+    </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
+
