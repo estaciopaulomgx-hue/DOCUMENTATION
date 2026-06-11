@@ -1,71 +1,230 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Image Search Inventory System</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DocTrack — Document Monitoring System</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-    <div class="container">
-        <!-- Header -->
-        <div class="header">
-            <h1>📸 Image Inventory</h1>
-            <p>Search and manage your product images</p>
-        </div>
-
-        <!-- Search Section -->
-        <div class="search-section">
-            <div class="search-upload-container">
-                <div class="search-bar">
-                    <input type="text" id="searchInput" placeholder="Search images...">
-                </div>
-                <div class="upload-section">
-                    <div class="file-input-wrapper">
-                        <input type="file" id="fileInput" accept="image/*" multiple>
-                        <label for="fileInput" class="file-input-label">Choose File</label>
-                    </div>
-                    <button class="upload-btn" id="uploadBtn">Upload</button>
-                </div>
-            </div>
-
-            <div class="stats">
-                <div class="stat-item">
-                    <div class="stat-value" id="totalImages">0</div>
-                    <div class="stat-label">Total Images</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-value" id="foundImages">0</div>
-                    <div class="stat-label">Found</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-value" id="selectedImages">0</div>
-                    <div class="stat-label">Selected</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Images Grid -->
-        <div class="images-grid" id="imagesGrid"></div>
-
-        <!-- No Results -->
-        <div class="no-results" id="noResults" style="display: none;">
-            <div class="no-results-icon">🔍</div>
-            <h3>No images found</h3>
-            <p>Try a different search term or upload new images</p>
-        </div>
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">DT</div>
+      <div>
+        <div class="brand-title">DocTrack</div>
+        <div class="brand-sub">SLA Monitoring</div>
+      </div>
     </div>
-
-    <!-- Modal -->
-    <div class="modal" id="imageModal">
-        <div class="modal-content">
-            <button class="modal-close" id="modalClose">×</button>
-            <img src="" alt="" class="modal-image" id="modalImage">
-        </div>
+    <nav class="nav">
+      <button class="nav-item active" data-view="dashboard">
+        <span class="ico">▦</span> Dashboard
+      </button>
+      <button class="nav-item" data-view="documents">
+        <span class="ico">▤</span> Documents
+      </button>
+    </nav>
+    <div class="sidebar-foot">
+      <div class="muted small">v1.0 · Local</div>
     </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div>
+        <h1 id="page-title">Dashboard</h1>
+        <p class="muted small" id="page-sub">Overview of document SLAs and recent activity.</p>
+      </div>
+      <div class="topbar-actions">
+        <button class="btn btn-ghost" id="btn-export">Export JSON</button>
+        <button class="btn btn-ghost" id="btn-reset">Reset Sample Data</button>
+        <button class="btn btn-primary" id="btn-new">+ New Document</button>
+      </div>
+    </header>
+
+    <!-- DASHBOARD VIEW -->
+    <section class="view" id="view-dashboard">
+      <div class="stats">
+        <div class="stat-card">
+          <div class="stat-label">Total Documents</div>
+          <div class="stat-value" id="stat-total">0</div>
+          <div class="stat-foot muted small">All records</div>
+        </div>
+        <div class="stat-card ongoing">
+          <div class="stat-label">Ongoing</div>
+          <div class="stat-value" id="stat-ongoing">0</div>
+          <div class="stat-foot muted small">Within SLA</div>
+        </div>
+        <div class="stat-card due">
+          <div class="stat-label">Due Today</div>
+          <div class="stat-value" id="stat-due">0</div>
+          <div class="stat-foot muted small">Action required</div>
+        </div>
+        <div class="stat-card overdue">
+          <div class="stat-label">Overdue</div>
+          <div class="stat-value" id="stat-overdue">0</div>
+          <div class="stat-foot muted small">Past SLA</div>
+        </div>
+        <div class="stat-card completed">
+          <div class="stat-label">Completed</div>
+          <div class="stat-value" id="stat-completed">0</div>
+          <div class="stat-foot muted small">Closed</div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-head">
+            <h2>Nearing Due (within 24 hours)</h2>
+            <span class="muted small" id="near-count">0</span>
+          </div>
+          <div class="list" id="near-list"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-head">
+            <h2>Top Overdue</h2>
+            <span class="muted small" id="topov-count">0</span>
+          </div>
+          <div class="list" id="topov-list"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <h2>Recent Activity</h2>
+        </div>
+        <div class="list" id="activity-list"></div>
+      </div>
+    </section>
+
+    <!-- DOCUMENTS VIEW -->
+    <section class="view hidden" id="view-documents">
+      <div class="card">
+        <div class="filters">
+          <input type="text" id="f-search" placeholder="Search number, customer, serial, person..." />
+          <select id="f-type">
+            <option value="all">All types</option>
+          </select>
+          <select id="f-status">
+            <option value="all">All statuses</option>
+            <option value="ongoing">Ongoing</option>
+            <option value="due_today">Due Today</option>
+            <option value="overdue">Overdue</option>
+            <option value="completed">Completed</option>
+          </select>
+          <input type="date" id="f-from" title="Start from" />
+          <input type="date" id="f-to" title="Start to" />
+          <button class="btn btn-ghost" id="f-clear">Clear</button>
+        </div>
+
+        <div class="tabs" id="tabs">
+          <button class="tab active" data-tab="all">All <span class="tab-count" id="c-all">0</span></button>
+          <button class="tab" data-tab="ongoing">Ongoing <span class="tab-count" id="c-ongoing">0</span></button>
+          <button class="tab" data-tab="due_today">Due Today <span class="tab-count" id="c-due_today">0</span></button>
+          <button class="tab" data-tab="overdue">Overdue <span class="tab-count" id="c-overdue">0</span></button>
+          <button class="tab" data-tab="completed">Completed <span class="tab-count" id="c-completed">0</span></button>
+        </div>
+
+        <div class="table-wrap">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Document #</th>
+                <th>Type</th>
+                <th>Customer</th>
+                <th>Serial #</th>
+                <th>Assigned</th>
+                <th>Start</th>
+                <th>Days</th>
+                <th>Due</th>
+                <th>Status</th>
+                <th class="ta-r">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="doc-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- DOCUMENT DIALOG -->
+  <div class="modal hidden" id="modal">
+    <div class="modal-backdrop" data-close></div>
+    <div class="modal-panel">
+      <div class="modal-head">
+        <h3 id="modal-title">New Document</h3>
+        <button class="icon-btn" data-close>✕</button>
+      </div>
+      <form id="doc-form" class="form">
+        <input type="hidden" id="d-id" />
+        <div class="form-grid">
+          <label>Document Number*
+            <input type="text" id="d-number" required />
+          </label>
+          <label>Document Type*
+            <select id="d-type" required>
+              <option value="Invoice">Invoice</option>
+              <option value="Purchase Order">Purchase Order</option>
+              <option value="Contract">Contract</option>
+              <option value="Service Request">Service Request</option>
+              <option value="RMA">RMA</option>
+              <option value="Quotation">Quotation</option>
+              <option value="Delivery Receipt">Delivery Receipt</option>
+            </select>
+          </label>
+          <label>Customer Name*
+            <input type="text" id="d-customer" required />
+          </label>
+          <label>Serial Number
+            <input type="text" id="d-serial" />
+          </label>
+          <label>Assigned To
+            <input type="text" id="d-assigned" placeholder="Full name" />
+          </label>
+          <label>Start Date*
+            <input type="date" id="d-start" required />
+          </label>
+          <label>Allowed Days*
+            <input type="number" id="d-days" min="1" value="2" required />
+          </label>
+          <label>Due Date (auto)
+            <input type="date" id="d-due" readonly />
+          </label>
+          <label class="span-2">Item Description
+            <textarea id="d-desc" rows="2"></textarea>
+          </label>
+          <label class="span-2">Remarks
+            <textarea id="d-remarks" rows="2"></textarea>
+          </label>
+        </div>
+        <div class="modal-foot">
+          <button type="button" class="btn btn-ghost" data-close>Cancel</button>
+          <button type="submit" class="btn btn-primary" id="submit-btn">Save Document</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- CONFIRM DIALOG -->
+  <div class="modal hidden" id="confirm">
+    <div class="modal-backdrop" data-close-confirm></div>
+    <div class="modal-panel sm">
+      <div class="modal-head">
+        <h3>Delete Document?</h3>
+      </div>
+      <div class="p-4">
+        <p id="confirm-msg" class="muted">This action cannot be undone.</p>
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-ghost" data-close-confirm>Cancel</button>
+        <button class="btn btn-danger" id="confirm-yes">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast hidden"></div>
 
   <script src="script.js"></script>
 </body>
 </html>
-
